@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="8dp">
+
+    <com.mikhaellopez.circularimageview.CircularImageView
+        android:id="@+id/image_1"
+        android:layout_width="@dimen/list_icon_size"
+        android:layout_height="@dimen/list_icon_size"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/image_splash"
+        app:civ_border_color="@color/color_list_icon_border"
+        app:civ_border_width="@dimen/list_icon_margin_size" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/image_1"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/image_1"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin_half"
+        android:layout_marginStart="@dimen/activity_horizontal_margin_half"
+        android:layout_toEndOf="@id/image_1"
+        android:layout_toRightOf="@id/image_1"
+        android:gravity="center_vertical"
+        tools:text="Douglas" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_divider_height"
+        android:background="@color/color_divider"
+        android:layout_below="@id/image_1"
+        android:layout_marginTop="@dimen/activity_vertical_margin_half"
+        android:layout_marginBottom="@dimen/activity_vertical_margin_half"/>
+
+</RelativeLayout>
