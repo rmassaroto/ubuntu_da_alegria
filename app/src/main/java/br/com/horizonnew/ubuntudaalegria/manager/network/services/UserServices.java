@@ -22,6 +22,5 @@ public interface UserServices {
             BuildConfig.HEADER_KEY_DEV_TOKEN + ": " + BuildConfig.HEADER_VALUE_DEV_TOKEN
     })
     @POST(BuildConfig.ENDPOINT + RESOURCE_SAVE_USER_DETAILS)
-    @FormUrlEncoded
     Call<JsonObject> getUserFeed();
 }

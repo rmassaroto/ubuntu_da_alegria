@@ -126,7 +126,9 @@ public class FeedListFragment extends Fragment {
     @Subscribe
     public void onGetUserFeed(OnGetUserFeedEvent event) {
         if (mUser.getId() == event.user.getId()) {
+            mSwipeRefreshLayout.setRefreshing(false);
 
+            mAdapter.setDataSet(event.posts);
         }
     }
 }
