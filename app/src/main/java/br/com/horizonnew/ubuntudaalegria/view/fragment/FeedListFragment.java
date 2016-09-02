@@ -15,8 +15,10 @@ import android.view.ViewGroup;
 import com.squareup.otto.Subscribe;
 
 import br.com.horizonnew.ubuntudaalegria.R;
-import br.com.horizonnew.ubuntudaalegria.manager.bus.event.OnGetUserFeedEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.feed.OnGetFeedEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.feed.OnRefreshFeedEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.provider.UserProviderBus;
+import br.com.horizonnew.ubuntudaalegria.manager.network.controller.UserController;
 import br.com.horizonnew.ubuntudaalegria.model.User;
 import br.com.horizonnew.ubuntudaalegria.view.adapter.FeedListAdapter;
 import retrofit2.Call;
@@ -115,20 +117,26 @@ public class FeedListFragment extends Fragment {
         outState.putParcelable(User.ARG, mUser);
     }
 
+    @Subscribe
+    public void onRefreshFeedList(OnRefreshFeedEvent event) {
+        refreshFeedList();
+    }
+
     private void refreshFeedList() {
         if (mCall == null) {
             mSwipeRefreshLayout.setRefreshing(true);
 
-            mCall = mUser.getFeed();
+            mCall = UserController.getFeed(mUser);
         }
     }
 
     @Subscribe
-    public void onGetUserFeed(OnGetUserFeedEvent event) {
-        if (mUser.getId() == event.user.getId()) {
+    public void onGetUserFeed(OnGetFeedEvent event) {
+        if (mUser.getId() == event.getUser().getId()) {
             mSwipeRefreshLayout.setRefreshing(false);
+            mCall = null;
 
-            mAdapter.setDataSet(event.posts);
+            mAdapter.setDataSet(event.getFeed());
         }
     }
 }

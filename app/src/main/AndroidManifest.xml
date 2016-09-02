@@ -28,7 +28,13 @@
         <activity
             android:name=".view.activity.CreatePostActivity"
             android:label="@string/title_activity_create_post"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:host="www.youtube.com" android:mimeType="text/*" android:scheme="https"/>
+            </intent-filter>
+            </activity>
     </application>
 
 </manifest>

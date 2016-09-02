@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -10,7 +10,8 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="br.com.horizonnew.ubuntudaalegria.view.activity.CreatePostActivity"
-    tools:showIn="@layout/activity_create_post">
+    tools:showIn="@layout/activity_create_post"
+    android:id="@+id/activity_create_post_scroll_view">
 
     <android.support.percent.PercentRelativeLayout
         android:layout_width="match_parent"
@@ -106,4 +107,4 @@
 
     </android.support.percent.PercentRelativeLayout>
 
-</ScrollView>
+</android.support.v4.widget.NestedScrollView>

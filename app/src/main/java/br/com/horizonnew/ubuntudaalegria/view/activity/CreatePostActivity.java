@@ -1,41 +1,47 @@
 package br.com.horizonnew.ubuntudaalegria.view.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.Switch;
+import android.widget.Toast;
 
-import com.google.gson.JsonObject;
+import com.squareup.otto.Subscribe;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
-import java.io.IOException;
 
 import br.com.horizonnew.ubuntudaalegria.R;
 import br.com.horizonnew.ubuntudaalegria.manager.base.BaseActivity;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.feed.OnRefreshFeedEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.media.OnUploadImageEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.media.OnUploadImageFailedEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.post.OnUploadPostEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.post.OnUploadPostFailedEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.provider.MediaProviderBus;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.provider.PostProviderBus;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.provider.UserProviderBus;
 import br.com.horizonnew.ubuntudaalegria.manager.image.PicassoSingleton;
-import br.com.horizonnew.ubuntudaalegria.manager.network.ServiceBuilder;
-import br.com.horizonnew.ubuntudaalegria.manager.network.services.PostServices;
+import br.com.horizonnew.ubuntudaalegria.manager.network.controller.MediaController;
+import br.com.horizonnew.ubuntudaalegria.manager.network.controller.PostController;
+import br.com.horizonnew.ubuntudaalegria.manager.network.controller.UserController;
 import br.com.horizonnew.ubuntudaalegria.manager.utils.AFImageProvider;
-import br.com.horizonnew.ubuntudaalegria.manager.utils.AFImageUtils;
 import br.com.horizonnew.ubuntudaalegria.model.Post;
 import br.com.horizonnew.ubuntudaalegria.model.User;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class CreatePostActivity extends BaseActivity {
 
@@ -44,14 +50,18 @@ public class CreatePostActivity extends BaseActivity {
     public static final String ARG_TYPE = "br.com.horizonnew.ubuntudaalegria.view.activity.CreatePostActivity.ARG_TYPE";
     public static final String ARG_IMAGE_PATH = "br.com.horizonnew.ubuntudaalegria.view.activity.CreatePostActivity.ARG_IMAGE_PATH";
 
+    private NestedScrollView mScrollView;
     private ImageView mPhotoImageView;
     private EditText mYoutubeUrl, mTitleEditText, mTextEditText;
     private Switch mCampaignSwitch;
+
+    private FloatingActionButton mFab;
 
     private AFImageProvider mImageProvider;
     private int mType;
 
     private String mImagePath;
+    private Post mPost;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +85,8 @@ public class CreatePostActivity extends BaseActivity {
             }
         }
 
+        mScrollView = (NestedScrollView) findViewById(R.id.activity_create_post_scroll_view);
+
         mYoutubeUrl = (EditText) findViewById(R.id.activity_create_post_url_edit_text);
         mPhotoImageView = (ImageView) findViewById(R.id.activity_create_post_image_view);
         mTitleEditText = (EditText) findViewById(R.id.activity_create_post_title_edit_text);
@@ -94,13 +106,30 @@ public class CreatePostActivity extends BaseActivity {
                 break;
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 createPost();
             }
         });
+        mFab.post(new Runnable() {
+            @Override
+            public void run() {
+                mScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+                    @Override
+                    public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                        if (scrollY > oldScrollY) {
+                            mFab.hide();
+                        } else {
+                            mFab.show();
+                        }
+                    }
+                });
+            }
+        });
+
+
     }
 
     @Override
@@ -115,9 +144,43 @@ public class CreatePostActivity extends BaseActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        try {
+            MediaProviderBus.getInstance().register(this);
+        } catch (Exception e) {
+            //Do nothing
+        }
+
+        try {
+            PostProviderBus.getInstance().register(this);
+        } catch (Exception e) {
+            //Do nothing
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        try {
+            MediaProviderBus.getInstance().unregister(this);
+        } catch (Exception e) {
+            //Do nothing
+        }
+
+        try {
+            PostProviderBus.getInstance().unregister(this);
+        } catch (Exception e) {
+            //Do nothing
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            setResult(RESULT_CANCELED);
+            finish();
             return true;
         } else if (item.getItemId() == R.id.action_picture) {
             addPicture();
@@ -212,73 +275,108 @@ public class CreatePostActivity extends BaseActivity {
         if (validateFields()) {
             if (mType == Post.TYPE_IMAGE) {
                 uploadPhoto();
+            } else if (mType == Post.TYPE_VIDEO) {
+                uploadPost(mYoutubeUrl.getText().toString().trim());
             }
         }
     }
 
     private void uploadPhoto() {
-        final User loggedUser = User.getLoggedUser(this);
+        final User loggedUser = UserController.getLoggedUser(this);
 
         if (loggedUser != null) {
-            final PostServices postServices = ServiceBuilder.createService(PostServices.class);
-
-            File file = new File(mImagePath);
-
-            try {
-                Bitmap compressedBitmap = AFImageUtils.decodeSampledBitmapFromFile(file.getPath(), 640, 640);
-                AFImageUtils.saveBitmapToFile(compressedBitmap, file);
-            } catch (IOException e) {
-                Log.d(LOG_TAG, "uploadPhoto: ", e);
-            }
-
-            RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), file);
-            MultipartBody.Part imageFileBody = MultipartBody.Part.createFormData("arquivo", file.getName(), requestBody);
-
-            Call<JsonObject> call = postServices.uploadImage(
-                    imageFileBody
+            showProgressDialog(
+                    R.string.dialog_title_wait,
+                    R.string.message_uploading_image_please_wait
             );
-            call.enqueue(new Callback<JsonObject>() {
-                @Override
-                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    if (response != null && response.body() != null) {
-                        JsonObject jsonObject = response.body();
 
-                        if (jsonObject.has("url")) {
-                            uploadPostJson(postServices, jsonObject.get("url").getAsString());
-                        } else {
-                            //TODO: handle this
-                        }
-                    } else {
-                        //TODO: handle this
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
-                    //TODO: Handle error
-                    Log.e(LOG_TAG, "onFailure: ", t);
-                }
-            });
+            MediaController.uploadImage(mImagePath);
         }
     }
 
-    private void uploadPostJson(PostServices postServices, String url) {
-        Post post = new Post();
+    @Subscribe
+    public void onUploadPhotoFailed(OnUploadImageFailedEvent event) {
+        if (event.getLocalUrl().equals(mImagePath)) {
+            dismissDialogs();
+
+            showAlertDialog(
+                    R.string.dialog_title_error,
+                    R.string.error_message_could_not_upload_image_want_to_try_again,
+                    R.string.button_cancel, null,
+                    R.string.button_try_again, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            uploadPhoto();
+                        }
+                    }
+            );
+        }
+    }
+
+    @Subscribe
+    public void onUploadPhoto(OnUploadImageEvent event) {
+        if (event.getLocalUrl().equals(mImagePath)) {
+            uploadPost(event.getRemoteUrl());
+        }
+    }
+
+    private void uploadPost(@Nullable String url) {
+        showProgressDialog(
+                R.string.dialog_title_wait,
+                R.string.message_uploading_post
+        );
+
+        mPost = new Post();
+
         switch (mType) {
             case Post.TYPE_VIDEO:
-                post.setUrl(mYoutubeUrl.getText().toString().trim());
-                post.setType(Post.TYPE_VIDEO);
+                mPost.setUrl(mYoutubeUrl.getText().toString().trim());
                 break;
             case Post.TYPE_IMAGE:
-                post.setUrl(url);
-                post.setType(Post.TYPE_IMAGE);
+                mPost.setUrl(url);
                 break;
+            case Post.TYPE_TEXT:
         }
 
-        post.setTitle(mTitleEditText.getText().toString().trim());
-        post.setText(mTextEditText.getText().toString().trim());
-        post.setCampaign(mCampaignSwitch.isChecked());
+        mPost.setType(mType);
 
-//        Call<JsonObject> call = postServices.createPost(post.to);
+        mPost.setTitle(mTitleEditText.getText().toString().trim());
+        mPost.setText(mTextEditText.getText().toString().trim());
+        mPost.setCampaign(mCampaignSwitch.isChecked());
+        mPost.setActive(true);
+
+        //TODO: Replace for the real user
+        mPost.setUser(new User());
+
+        PostController.uploadPost(mPost);
+    }
+
+    @Subscribe
+    public void onUploadPostFailed(OnUploadPostFailedEvent event) {
+        if (event.getLocalPost() == mPost) {
+            dismissDialogs();
+
+            showAlertDialog(
+                    R.string.dialog_title_error,
+                    R.string.error_message_could_not_upload_post_want_to_try_again,
+                    R.string.button_cancel, null,
+                    R.string.button_try_again, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            uploadPost(mImagePath);
+                        }
+                    }
+            );
+        }
+    }
+
+    @Subscribe
+    public void onUploadPost(OnUploadPostEvent event) {
+        if (event.getLocalPost() == mPost) {
+            Toast.makeText(this, R.string.message_post_successfully_created, Toast.LENGTH_LONG).show();
+
+            UserProviderBus.getInstance().post(new OnRefreshFeedEvent());
+            finish();
+        }
     }
 }

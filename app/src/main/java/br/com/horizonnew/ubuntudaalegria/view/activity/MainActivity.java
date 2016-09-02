@@ -2,21 +2,18 @@ package br.com.horizonnew.ubuntudaalegria.view.activity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
-
-import com.squareup.otto.Subscribe;
 
 import br.com.horizonnew.ubuntudaalegria.R;
 import br.com.horizonnew.ubuntudaalegria.manager.base.BaseActivity;
-import br.com.horizonnew.ubuntudaalegria.manager.bus.event.OnGetUserFeedEvent;
-import br.com.horizonnew.ubuntudaalegria.manager.bus.provider.UserProviderBus;
+import br.com.horizonnew.ubuntudaalegria.manager.network.controller.UserController;
 import br.com.horizonnew.ubuntudaalegria.model.User;
 import br.com.horizonnew.ubuntudaalegria.view.fragment.FeedListFragment;
 
@@ -32,16 +29,18 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         if (savedInstanceState == null) {
-            loggedUser = User.getLoggedUser(this);
+            loggedUser = UserController.getLoggedUser(this);
 
-            if (loggedUser != null) {
+//            if (loggedUser != null) {
                 FeedListFragment fragment = FeedListFragment.newInstance(loggedUser);
                 showFragment(fragment, FeedListFragment.TAG, false);
-            } else {
-                //TODO: Handle this
-            }
+//            } else {
+//
+//            }
         }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -51,6 +50,13 @@ public class MainActivity extends BaseActivity {
                 showCreatePostDialog();
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
     }
 
     private void showFragment(@NonNull Fragment fragment, @Nullable String fragmentTag,

@@ -26,7 +26,7 @@ public class PermissionsHelper {
                 AlertDialog.Builder builder = new AlertDialog.Builder(activity)
                         .setTitle(R.string.dialog_title_permission_denied)
                         .setMessage(rationaleRequestMessageResId)
-                        .setNegativeButton(R.string.dialog_button_im_sure, new DialogInterface.OnClickListener() {
+                        .setNegativeButton(R.string.button_im_sure, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (activity instanceof AppCompatActivity) {
@@ -34,7 +34,7 @@ public class PermissionsHelper {
                                 }
                             }
                         })
-                        .setPositiveButton(R.string.dialog_button_try_again, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.button_try_again, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 ActivityCompat.requestPermissions(activity, new String[]{permission}, requestCode);
