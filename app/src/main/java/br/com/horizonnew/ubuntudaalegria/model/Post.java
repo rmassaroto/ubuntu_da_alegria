@@ -2,6 +2,11 @@ package br.com.horizonnew.ubuntudaalegria.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 /**
  * Created by renan on 30/08/16.
@@ -30,15 +35,24 @@ public class Post implements Parcelable {
         }
     };
 
-    public Post(boolean campaign) {
-        type = TYPE_IMAGE;
-        id = 1;
-        this.campaign = campaign;
-        title = "Título do post";
-        url = "http://www.ultracurioso.com.br/wp-content/uploads/2016/01/palha%C3%A7o-capa.jpg";
-        description = "Descrição do post";
-        text = "Texto do post";
-        user = User.getLoggedUser(null);
+    public Post() {
+        super();
+    }
+
+    public Post(@NonNull JsonElement element) throws JsonParseException {
+        if (element.isJsonObject()) {
+            JsonObject jsonObject = element.getAsJsonObject();
+
+            title = jsonObject.get("title").getAsString();
+            description = jsonObject.get("description").getAsString();
+            text = jsonObject.get("text").getAsString();
+            url = jsonObject.get("url").getAsString();
+            type = jsonObject.get("type").getAsInt();
+            campaign = jsonObject.get("campaign").getAsInt() == 1;
+
+        } else {
+            throw new RuntimeException("Json element must be a valid json object");
+        }
     }
 
     public Post(Parcel in) {
@@ -133,5 +147,11 @@ public class Post implements Parcelable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public JsonObject toJsonObject() {
+        JsonObject jsonObject = new JsonObject();
+
+        return jsonObject;
     }
 }

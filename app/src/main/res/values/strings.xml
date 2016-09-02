@@ -2,10 +2,20 @@
     <string name="app_name">Ubuntu da Alegria</string>
 
     <!-- Activity titles -->
+    <string name="title_activity_main">Ubuntu da Alegria</string>
     <string name="title_activity_create_post">Criar post</string>
 
     <!-- Dialog titles -->
     <string name="dialog_title_post_type">Qual tipo de post?</string>
+
+    <!-- Hint -->
+    <string name="hint_url">Link do Youtube</string>
+    <string name="hint_title">Título</string>
+    <string name="hint_text">Texto</string>
+    <string name="hint_campaign">Campanha</string>
+
+    <!-- Menu -->
+    <string name="menu_add_photo">Adicionar foto</string>
 
     <!-- MainActivity -->
     <array name="activity_main_post_types">
@@ -16,5 +26,16 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="dialog_title_permission_denied">Permissão negada</string>
+    <string name="dialog_button_im_sure">ESTOU CERTO</string>
+    <string name="dialog_button_try_again">TENTAR NOVAMENTE</string>
+
+    <array name="picture_sources">
+        <item>Tirar foto</item>
+        <item>Escolher da galeria</item>
+    </array>
+
+    <string name="error_field_cannot_be_empty">Este campo não pode ficar vazio!</string>
 
 </resources>

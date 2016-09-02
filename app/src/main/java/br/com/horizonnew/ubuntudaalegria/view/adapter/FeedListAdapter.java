@@ -70,17 +70,19 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.BaseVi
             case Post.TYPE_IMAGE:
                 ImageViewHolder imageViewHolder = (ImageViewHolder) holder;
 
-                if (post.getUser().getPictureUrl() != null && !post.getUser().getPictureUrl().trim().isEmpty()) {
-                    PicassoSingleton.getInstance(mContext)
-                            .load(post.getUser().getPictureUrl())
-                            .fit()
-                            .centerCrop()
-                            .placeholder(R.mipmap.ic_launcher)
-                            .error(R.mipmap.ic_launcher)
-                            .into(imageViewHolder.userProfileImageView);
-                }
+                if (post.getUser() != null) {
+                    if (post.getUser().getPictureUrl() != null && !post.getUser().getPictureUrl().trim().isEmpty()) {
+                        PicassoSingleton.getInstance(mContext)
+                                .load(post.getUser().getPictureUrl())
+                                .fit()
+                                .centerCrop()
+                                .placeholder(R.mipmap.ic_launcher)
+                                .error(R.mipmap.ic_launcher)
+                                .into(imageViewHolder.userProfileImageView);
+                    }
 
-                imageViewHolder.userNameImageView.setText(post.getUser().getName());
+                    imageViewHolder.userNameImageView.setText(post.getUser().getName());
+                }
 
                 if (post.getUrl() != null && !post.getUrl().trim().isEmpty()) {
                     PicassoSingleton.getInstance(mContext)
@@ -92,7 +94,8 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.BaseVi
                             .into(imageViewHolder.postImageView);
                 }
 
-
+                imageViewHolder.postTitleImageView.setText(post.getTitle());
+                imageViewHolder.postDescriptionImageView.setText(post.getDescription());
 
                 break;
         }
@@ -118,7 +121,7 @@ public class FeedListAdapter extends RecyclerView.Adapter<FeedListAdapter.BaseVi
             super(itemView);
 
             userProfileImageView = (ImageView) itemView.findViewById(R.id.image_1);
-            postImageView = (ImageView) itemView.findViewById(R.id.image_2);
+            postImageView = (ImageView) itemView.findViewById(R.id.activity_create_post_image_view);
 
             userNameImageView = (TextView) itemView.findViewById(R.id.text_1);
             postTitleImageView = (TextView) itemView.findViewById(R.id.text_2);

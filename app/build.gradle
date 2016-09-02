@@ -1,4 +1,15 @@
+buildscript {
+    repositories {
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+    }
+}
+
 apply plugin: 'com.android.application'
+
+repositories {
+    jcenter()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+}
 
 android {
     compileSdkVersion 24
@@ -12,7 +23,7 @@ android {
         versionName "1.0"
 
         buildConfigField "String", "URL_API", '"http://horizonnew.com.br/"'
-        buildConfigField "String", "ENDPOINT", '"api/"'
+        buildConfigField "String", "ENDPOINT", '"ci/crm/api/olhoAmigo/"'
         buildConfigField "String", "HEADER_KEY_APPLICATION_KEY", '"afplatform-application-key"'
         buildConfigField "String", "HEADER_KEY_DEV_TOKEN", '"afplatform-dev-token"'
         buildConfigField "String", "HEADER_VALUE_APPLICATION_KEY", '"60cd4a02448bd294420ddd2163b60065"'
@@ -36,8 +47,9 @@ dependencies {
     compile 'com.android.support:cardview-v7:24.2.0'
     compile 'com.android.support:percent:24.2.0'
     compile 'com.squareup:otto:1.3.8'
-    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.squareup.picasso:picasso:2.6.0-SNAPSHOT'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.mikhaellopez:circularimageview:3.0.2'
+    compile 'com.theartofdev.edmodo:android-image-cropper:2.2.5'
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,66 +12,98 @@
     tools:context="br.com.horizonnew.ubuntudaalegria.view.activity.CreatePostActivity"
     tools:showIn="@layout/activity_create_post">
 
-    <ImageView
-        android:id="@+id/image_2"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/image_splash"
-        app:layout_widthPercent="100%"
-        app:layout_aspectRatio="178%" />
-
-    <TextView
-        style="@style/TextAppearance.AppCompat.Caption"
-        android:layout_width="wrap_content"
+    <android.support.percent.PercentRelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/image_2"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:background="@color/colorPrimary"
-        android:paddingEnd="@dimen/activity_horizontal_margin_half"
-        android:paddingLeft="@dimen/activity_horizontal_margin_half"
-        android:paddingRight="@dimen/activity_horizontal_margin_half"
-        android:paddingStart="@dimen/activity_horizontal_margin_half"
-        android:textColor="@color/white"
-        tools:text="Campanha" />
+        android:focusableInTouchMode="true">
 
-    <View
-        android:id="@+id/divider_2"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/list_divider_height"
-        android:layout_below="@id/image_2"
-        android:layout_marginBottom="@dimen/activity_vertical_margin_half"
-        android:layout_marginTop="@dimen/activity_vertical_margin_half"
-        android:background="@color/color_divider" />
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/activity_create_post_url"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true">
 
-    <TextView
-        android:id="@+id/text_2"
-        style="@style/TextAppearance.AppCompat.Subhead"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/text_field_height"
-        android:layout_below="@id/divider_2"
-        android:gravity="start|center_vertical"
-        android:padding="@dimen/activity_vertical_margin_half"
-        tools:text="Título" />
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/activity_create_post_url_edit_text"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/text_field_height"
+                android:hint="@string/hint_url"
+                android:lines="1" />
 
-    <View
-        android:id="@+id/divider_3"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/list_divider_height"
-        android:layout_below="@id/text_2"
-        android:layout_marginBottom="@dimen/activity_vertical_margin_half"
-        android:layout_marginTop="@dimen/activity_vertical_margin_half"
-        android:background="@color/color_divider" />
+        </android.support.design.widget.TextInputLayout>
 
-    <TextView
-        android:id="@+id/text_3"
-        style="@style/TextAppearance.AppCompat.Body1"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/text_field_height"
-        android:layout_below="@id/divider_3"
-        android:gravity="start|center_vertical"
-        android:padding="@dimen/activity_vertical_margin_half"
-        tools:text="Texto" />
+        <ImageView
+            android:id="@+id/activity_create_post_image_view"
+            android:layout_below="@id/activity_create_post_url"
+            android:src="@drawable/image_splash"
+            app:layout_aspectRatio="100%"
+            app:layout_widthPercent="100%"
+            android:background="@color/white"
+            android:scaleType="centerCrop"/>
 
+        <View
+            android:id="@+id/divider_2"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/list_divider_height"
+            android:layout_below="@id/activity_create_post_image_view"
+            android:layout_marginBottom="@dimen/activity_vertical_margin_half"
+            android:layout_marginTop="@dimen/activity_vertical_margin_half"
+            android:background="@color/color_divider" />
 
-</android.support.percent.PercentRelativeLayout>
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/activity_create_post_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/divider_2">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/activity_create_post_title_edit_text"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/text_field_height"
+                android:hint="@string/hint_title"
+                android:inputType="textCapSentences"
+                android:maxLines="1"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/activity_create_post_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/activity_create_post_title">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/activity_create_post_text_edit_text"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_text"
+                android:minHeight="@dimen/text_field_height" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <Switch
+            android:id="@+id/activity_create_post_campaign_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/activity_create_post_campaign_text_view"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/activity_create_post_campaign_text_view"
+            android:layout_below="@id/activity_create_post_text"
+            android:layout_marginTop="@dimen/activity_vertical_margin" />
+
+        <TextView
+            android:id="@id/activity_create_post_campaign_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/text_field_height"
+            android:layout_below="@id/activity_create_post_text"
+            android:layout_marginTop="@dimen/activity_vertical_margin_half"
+            android:gravity="center_vertical"
+            android:text="@string/hint_campaign" />
+
+    </android.support.percent.PercentRelativeLayout>
+
+</ScrollView>

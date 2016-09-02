@@ -18,6 +18,8 @@ public class PicassoSingleton {
         if (mInstance == null)
             mInstance = Picasso.with(context.getApplicationContext());
 
+        mInstance.setLoggingEnabled(true);
+
         return mInstance;
     }
 }

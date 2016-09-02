@@ -53,7 +53,7 @@
             android:background="@color/color_divider" />
 
         <ImageView
-            android:id="@+id/image_2"
+            android:id="@+id/activity_create_post_image_view"
             android:layout_below="@id/divider_1"
             android:src="@drawable/image_splash"
             app:layout_widthPercent="100%"
@@ -66,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_alignTop="@id/image_2"
+            android:layout_alignTop="@id/activity_create_post_image_view"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:background="@color/colorPrimary"
             android:paddingEnd="@dimen/activity_horizontal_margin_half"
@@ -80,7 +80,7 @@
             android:id="@+id/divider_2"
             android:layout_width="match_parent"
             android:layout_height="@dimen/list_divider_height"
-            android:layout_below="@id/image_2"
+            android:layout_below="@id/activity_create_post_image_view"
             android:layout_marginBottom="@dimen/activity_vertical_margin_half"
             android:layout_marginTop="@dimen/activity_vertical_margin_half"
             android:background="@color/color_divider" />
