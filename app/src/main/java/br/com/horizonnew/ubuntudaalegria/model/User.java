@@ -18,8 +18,10 @@ public class User implements Parcelable {
     public static final String ARG = "br.com.horizonnew.ubuntudaalegria.model.User.ARG";
 
     public static final String API_KEYWORD_USER_ID = "user_id";
+    public static final String API_KEYWORD_EMAIL = "email";
     public static final String API_KEYWORD_NAME = "name";
     public static final String API_KEYWORD_PICTURE_URL = "picture_url";
+    public static final String API_KEYWORD_PASSWORD = "password";
 
     private long id;
     private String name, pictureUrl;

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_login"
+    android:fitsSystemWindows="true"
+    tools:context="br.com.horizonnew.ubuntudaalegria.view.activity.LoginActivity">
+
+    <android.support.percent.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:focusableInTouchMode="true"
+        android:animateLayoutChanges="true">
+
+        <ImageView
+            android:id="@+id/activity_login_logo_image_view"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/image_logo"
+            app:layout_aspectRatio="134%"
+            app:layout_widthPercent="60%" />
+
+        <EditText
+            android:id="@+id/activity_login_email_edit_text"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/activity_login_logo_image_view"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="64dp"
+            android:background="@drawable/background_edit_text_login"
+            android:gravity="center_horizontal"
+            android:hint="Email"
+            android:padding="16dp"
+            android:textColor="@color/colorAccent"
+            android:textColorHint="@color/colorAccent"
+            android:inputType="textEmailAddress"/>
+
+        <EditText
+            android:id="@+id/activity_login_password_edit_text"
+            style="@style/TextAppearance.AppCompat.Body1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/activity_login_email_edit_text"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:background="@drawable/background_edit_text_login"
+            android:gravity="center_horizontal"
+            android:hint="Senha"
+            android:padding="16dp"
+            android:textColor="@color/colorAccent"
+            android:textColorHint="@color/colorAccent"
+            android:inputType="textPassword"/>
+
+        <RelativeLayout
+            android:id="@+id/activity_login_login_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/activity_login_password_edit_text">
+
+            <Button
+                android:id="@+id/activity_login_log_in_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Entrar"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:background="@drawable/background_button_login"
+                android:textColor="@color/white"/>
+
+            <Button
+                android:id="@+id/activity_login_guest_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Visitante"
+                android:layout_below="@id/activity_login_log_in_button"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:background="@drawable/background_button_login_guest"
+                android:textColor="@color/white"/>
+
+            <TextView
+                android:id="@+id/activity_login_sign_up_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Não possui um cadastro ainda? Cadastre-se aqui!"
+                android:layout_below="@id/activity_login_guest_button"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:gravity="center"
+                android:textColor="@color/white"
+                style="@style/TextAppearance.AppCompat.Caption"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/activity_login_sign_up_relative_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/activity_login_password_edit_text"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/activity_login_sign_up_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Cadastrar"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:background="@drawable/background_button_login"
+                android:textColor="@color/white"/>
+
+        </RelativeLayout>
+
+
+    </android.support.percent.PercentRelativeLayout>
+
+
+</ScrollView>

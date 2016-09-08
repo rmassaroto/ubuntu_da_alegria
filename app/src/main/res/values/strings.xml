@@ -10,17 +10,24 @@
     <string name="dialog_title_post_type">Qual tipo de post?</string>
     <string name="dialog_title_wait">Aguarde</string>
     <string name="dialog_title_error">Erro</string>
+    <string name="dialog_title_contact">Contato</string>
 
     <!-- Messages -->
     <string name="message_uploading_image_please_wait">Enviando imagem, por favor aguarde&#8230;</string>
     <string name="message_uploading_post">Criando post, por favor aguarde&#8230;</string>
     <string name="message_post_successfully_created">Seu post foi criado com sucesso!</string>
+    <string name="message_login_doing_log_user_in_please_wait">Entrando, por favor aguarde&#8230;</string>
 
     <!-- Error messages -->
     <string name="error_message_could_not_upload_image_want_to_try_again">Não foi possível enviar a imagem, quer tentar novamente?</string>
     <string name="error_message_could_not_upload_post_want_to_try_again">Não foi possível criar o post, quer tentar novamente?</string>
+    <string name="error_message_could_not_log_user_want_to_try_again">Não foi entrar, quer tentar novamente?</string>
+
+    <!-- Text field error messages -->
+    <string name="error_field_cannot_be_empty">Este campo não pode ficar vazio!</string>
 
     <!-- Buttons -->
+    <string name="button_ok">@android:string/ok</string>
     <string name="button_im_sure">ESTOU CERTO</string>
     <string name="button_try_again">TENTAR NOVAMENTE</string>
     <string name="button_cancel">@android:string/cancel</string>
@@ -46,6 +53,12 @@
         <item>Escolher da galeria</item>
     </array>
 
-    <string name="error_field_cannot_be_empty">Este campo não pode ficar vazio!</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
 
 </resources>

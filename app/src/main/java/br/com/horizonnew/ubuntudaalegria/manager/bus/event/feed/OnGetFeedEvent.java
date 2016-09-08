@@ -1,6 +1,7 @@
 package br.com.horizonnew.ubuntudaalegria.manager.bus.event.feed;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 
@@ -15,17 +16,17 @@ public class OnGetFeedEvent {
     private User user;
     private ArrayList<Post> feed;
 
-    public OnGetFeedEvent(@NonNull User user, @NonNull ArrayList<Post> feed) {
+    public OnGetFeedEvent(@Nullable User user, @NonNull ArrayList<Post> feed) {
         this.user = user;
         this.feed = feed;
     }
 
-    @NonNull
+    @Nullable
     public User getUser() {
         return user;
     }
 
-    public void setUser(@NonNull User user) {
+    public void setUser(@Nullable User user) {
         this.user = user;
     }
 

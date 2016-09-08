@@ -3,6 +3,7 @@ package br.com.horizonnew.ubuntudaalegria.view.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +17,7 @@ import com.squareup.otto.Subscribe;
 
 import br.com.horizonnew.ubuntudaalegria.R;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.event.feed.OnGetFeedEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.feed.OnGetFeedFailedEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.event.feed.OnRefreshFeedEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.provider.UserProviderBus;
 import br.com.horizonnew.ubuntudaalegria.manager.network.controller.UserController;
@@ -43,11 +45,14 @@ public class FeedListFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static FeedListFragment newInstance(@NonNull User user) {
+    public static FeedListFragment newInstance(@Nullable User user) {
         FeedListFragment fragment = new FeedListFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(User.ARG, user);
-        fragment.setArguments(args);
+
+        if (user != null) {
+            Bundle args = new Bundle();
+            args.putParcelable(User.ARG, user);
+            fragment.setArguments(args);
+        }
         return fragment;
     }
 
@@ -55,10 +60,11 @@ public class FeedListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState == null)
+        if (savedInstanceState == null && getArguments() != null) {
             mUser = getArguments().getParcelable(User.ARG);
-        else
+        } else if (savedInstanceState != null) {
             mUser = savedInstanceState.getParcelable(User.ARG);
+        }
 
         try {
             UserProviderBus.getInstance().register(this);
@@ -131,12 +137,19 @@ public class FeedListFragment extends Fragment {
     }
 
     @Subscribe
-    public void onGetUserFeed(OnGetFeedEvent event) {
-        if (mUser.getId() == event.getUser().getId()) {
+    public void onGetFeed(OnGetFeedEvent event) {
+        if (mUser != null && event.getUser() != null &&
+                mUser.getId() == event.getUser().getId()) {
             mSwipeRefreshLayout.setRefreshing(false);
             mCall = null;
 
             mAdapter.setDataSet(event.getFeed());
         }
+    }
+
+    @Subscribe
+    public void onGetFeedFailed(OnGetFeedFailedEvent event) {
+        mSwipeRefreshLayout.setRefreshing(false);
+        mCall = null;
     }
 }

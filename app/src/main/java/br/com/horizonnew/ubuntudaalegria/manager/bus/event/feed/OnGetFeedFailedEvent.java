@@ -13,19 +13,19 @@ public class OnGetFeedFailedEvent {
     private User user;
     private Throwable throwable;
 
-    public OnGetFeedFailedEvent(@NonNull User user, @Nullable Throwable throwable) {
+    public OnGetFeedFailedEvent(@Nullable User user, @Nullable Throwable throwable) {
         super();
 
         this.user = user;
         this.throwable = throwable;
     }
 
-    @NonNull
+    @Nullable
     public User getUser() {
         return user;
     }
 
-    public void setUser(@NonNull User user) {
+    public void setUser(@Nullable User user) {
         this.user = user;
     }
 
