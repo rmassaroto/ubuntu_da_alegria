@@ -16,6 +16,10 @@ import br.com.horizonnew.ubuntudaalegria.manager.bus.event.feed.OnGetFeedEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.event.feed.OnGetFeedFailedEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.event.user.OnLogUserInEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.event.user.OnLogUserInFailedEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.user.OnSignUserUpEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.user.OnSignUserUpFailedEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.user.OnUpdateUserProfileEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.user.OnUpdateUserProfileFailedEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.provider.UserProviderBus;
 import br.com.horizonnew.ubuntudaalegria.manager.network.ServiceBuilder;
 import br.com.horizonnew.ubuntudaalegria.manager.network.services.UserServices;
@@ -40,6 +44,77 @@ public class UserController {
     private UserController() {}
 
     @NonNull
+    public static Call updateUserProfile(@NonNull final Context context, @NonNull final User user) {
+        UserServices userServices = ServiceBuilder.createService(UserServices.class);
+
+        Call<JsonObject> call = userServices.updateUserProfile(user.toJsonObject(true));
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful() && response.body().has("response") && response.body().get("response").isJsonObject()) {
+                    JsonObject responseJson = response.body().get("response").getAsJsonObject();
+
+                    User user = new User(responseJson);
+                    if (setLoggedUser(context, user)) {
+                        UserProviderBus.getInstance().post(new OnUpdateUserProfileEvent(user));
+                    } else {
+                        UserProviderBus.getInstance().post(new OnUpdateUserProfileFailedEvent(user));
+                    }
+                } else {
+                    UserProviderBus.getInstance().post(new OnUpdateUserProfileFailedEvent(user));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                UserProviderBus.getInstance().post(new OnUpdateUserProfileFailedEvent(user));
+            }
+        });
+
+        return call;
+    }
+
+    @NonNull
+    public static Call signUserUp(@NonNull final Context context, @NonNull String email,
+                                 @NonNull String password, @NonNull String name) {
+        UserServices userServices = ServiceBuilder.createService(UserServices.class);
+
+        User user = new User();
+        user.setEmail(email);
+        user.setName(name);
+        user.setGroup(1);
+
+        JsonObject body = user.toJsonObject(false);
+        body.addProperty(User.API_KEYWORD_PASSWORD, password);
+
+        Call<JsonObject> call = userServices.signUserUp(body);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                if (response.isSuccessful() && response.body().has("response") && response.body().get("response").isJsonObject()) {
+                    JsonObject responseJson = response.body().get("response").getAsJsonObject();
+
+                    User user = new User(responseJson);
+                    if (setLoggedUser(context, user)) {
+                        UserProviderBus.getInstance().post(new OnSignUserUpEvent(user));
+                    } else {
+                        UserProviderBus.getInstance().post(new OnSignUserUpFailedEvent());
+                    }
+                } else {
+                    UserProviderBus.getInstance().post(new OnSignUserUpFailedEvent());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                UserProviderBus.getInstance().post(new OnSignUserUpFailedEvent());
+            }
+        });
+
+        return call;
+    }
+
+    @NonNull
     public static Call logUserIn(@NonNull final Context context, @NonNull String email,
                                  @NonNull String password) {
         UserServices userServices = ServiceBuilder.createService(UserServices.class);
@@ -48,7 +123,7 @@ public class UserController {
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                if (response.isSuccessful() && response.body().has("response")) {
+                if (response.isSuccessful() && response.body().has("response") && response.body().get("response").isJsonObject()) {
                     JsonObject responseJson = response.body().get("response").getAsJsonObject();
 
                     User user = new User(responseJson);
@@ -58,17 +133,7 @@ public class UserController {
                         UserProviderBus.getInstance().post(new OnLogUserInFailedEvent());
                     }
                 } else {
-//                    UserProviderBus.getInstance().post(new OnLogUserInFailedEvent());
-                    User user = new User();
-                    user.setId(1);
-                    user.setName("Renan");
-                    user.setPictureUrl("https://s-media-cache-ak0.pinimg.com/564x/46/4d/b4/464db481215b679faad01c83a8addcf7.jpg");
-
-                    if (setLoggedUser(context, user)) {
-                        UserProviderBus.getInstance().post(new OnLogUserInEvent(user));
-                    } else {
-                        UserProviderBus.getInstance().post(new OnLogUserInFailedEvent());
-                    }
+                    UserProviderBus.getInstance().post(new OnLogUserInFailedEvent());
                 }
             }
 
@@ -85,13 +150,22 @@ public class UserController {
         if (AFSharedPreferencesUtils.putString(
                 context,
                 PREFERENCES_KEY_LOGGED_USER,
-                user.toJsonObject().toString())) {
+                user.toJsonObject(true).toString())) {
             mLoggedUser = user;
 
             return true;
         } else {
             return false;
         }
+    }
+
+    public static boolean logUserOut(@NonNull Context context) {
+        boolean result = AFSharedPreferencesUtils.remove(context, PREFERENCES_KEY_LOGGED_USER);
+
+        if (result)
+            mLoggedUser = null;
+
+        return result;
     }
 
     @Nullable

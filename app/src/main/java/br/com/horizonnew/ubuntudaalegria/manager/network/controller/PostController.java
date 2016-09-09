@@ -1,11 +1,14 @@
 package br.com.horizonnew.ubuntudaalegria.manager.network.controller;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.util.Log;
 
 import com.google.gson.JsonObject;
 
 import br.com.horizonnew.ubuntudaalegria.manager.bus.event.media.OnUploadImageFailedEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.post.OnCommentSendEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.post.OnCommentSendFailedEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.event.post.OnUploadPostEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.event.post.OnUploadPostFailedEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.provider.MediaProviderBus;
@@ -23,6 +26,39 @@ import retrofit2.Response;
 public class PostController {
 
     private static final String LOG_TAG = "PostController";
+
+    public static void sendComment(@NonNull String senderEmail, @NonNull String receiverEmail, @NonNull String comment) {
+        PostServices postServices = ServiceBuilder.createService(PostServices.class);
+
+        Call<JsonObject> call = postServices.sendContact(
+                senderEmail,
+                receiverEmail,
+                comment
+        );
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                try {
+                    JsonObject jsonObject = response.body();
+
+                    if (response.isSuccessful() && jsonObject.has("response") && !jsonObject.get("response").isJsonNull()) {
+                        PostProviderBus.getInstance().post(new OnCommentSendEvent());
+                    }
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, "onResponse: ", e);
+
+                    PostProviderBus.getInstance().post(new OnCommentSendFailedEvent());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                Log.e(LOG_TAG, "onFailure: ", t);
+
+                PostProviderBus.getInstance().post(new OnCommentSendFailedEvent());
+            }
+        });
+    }
 
     public static void uploadPost(@NonNull final Post post) {
         PostServices postServices = ServiceBuilder.createService(PostServices.class);

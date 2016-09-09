@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import br.com.horizonnew.ubuntudaalegria.BuildConfig;
 import br.com.horizonnew.ubuntudaalegria.model.User;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Headers;
@@ -15,8 +16,28 @@ import retrofit2.http.POST;
  */
 public interface UserServices {
 
-    String RESOURCE_LOG_USER_IN = "get_feed";
+    String RESOURCE_UPDATE_USER_PROFILE = "editProfile";
+    String RESOURCE_SIGN_UP = "sign_up";
+    String RESOURCE_LOG_USER_IN = "login";
     String RESOURCE_GET_FEED = "get_feed";
+
+    @Headers({
+            BuildConfig.HEADER_KEY_APPLICATION_KEY + ": " + BuildConfig.HEADER_VALUE_APPLICATION_KEY,
+            BuildConfig.HEADER_KEY_DEV_TOKEN + ": " + BuildConfig.HEADER_VALUE_DEV_TOKEN
+    })
+    @POST(BuildConfig.ENDPOINT + RESOURCE_UPDATE_USER_PROFILE)
+    Call<JsonObject> updateUserProfile(
+            @Body() JsonObject user
+    );
+
+    @Headers({
+            BuildConfig.HEADER_KEY_APPLICATION_KEY + ": " + BuildConfig.HEADER_VALUE_APPLICATION_KEY,
+            BuildConfig.HEADER_KEY_DEV_TOKEN + ": " + BuildConfig.HEADER_VALUE_DEV_TOKEN
+    })
+    @POST(BuildConfig.ENDPOINT + RESOURCE_SIGN_UP)
+    Call<JsonObject> signUserUp(
+            @Body() JsonObject user
+    );
 
     @Headers({
             BuildConfig.HEADER_KEY_APPLICATION_KEY + ": " + BuildConfig.HEADER_VALUE_APPLICATION_KEY,

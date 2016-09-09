@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
 
@@ -19,13 +20,18 @@ import br.com.horizonnew.ubuntudaalegria.R;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.event.feed.OnGetFeedEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.event.feed.OnGetFeedFailedEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.event.feed.OnRefreshFeedEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.post.OnCommentSendEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.post.OnCommentSendFailedEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.provider.UserProviderBus;
+import br.com.horizonnew.ubuntudaalegria.manager.network.controller.PostController;
 import br.com.horizonnew.ubuntudaalegria.manager.network.controller.UserController;
+import br.com.horizonnew.ubuntudaalegria.model.Post;
 import br.com.horizonnew.ubuntudaalegria.model.User;
 import br.com.horizonnew.ubuntudaalegria.view.adapter.FeedListAdapter;
+import br.com.horizonnew.ubuntudaalegria.view.dialog.ContactFragmentDialog;
 import retrofit2.Call;
 
-public class FeedListFragment extends Fragment {
+public class FeedListFragment extends Fragment implements FeedListAdapter.OnCommentInteractionListener {
 
     public static final String TAG = "br.com.horizonnew.ubuntudaalegria.view.fragment.FeedListFragment";
 
@@ -84,7 +90,7 @@ public class FeedListFragment extends Fragment {
 
         mLayoutManager = new LinearLayoutManager(getContext());
 
-        mAdapter = new FeedListAdapter(getContext());
+        mAdapter = new FeedListAdapter(getContext(), this);
 
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -138,18 +144,46 @@ public class FeedListFragment extends Fragment {
 
     @Subscribe
     public void onGetFeed(OnGetFeedEvent event) {
-        if (mUser != null && event.getUser() != null &&
-                mUser.getId() == event.getUser().getId()) {
             mSwipeRefreshLayout.setRefreshing(false);
             mCall = null;
 
             mAdapter.setDataSet(event.getFeed());
-        }
     }
 
     @Subscribe
     public void onGetFeedFailed(OnGetFeedFailedEvent event) {
         mSwipeRefreshLayout.setRefreshing(false);
         mCall = null;
+    }
+
+    @Override
+    public void onCommentInteraction(int position, final Post post) {
+        ContactFragmentDialog contactFragmentDialog = new ContactFragmentDialog();
+        contactFragmentDialog.setListener(new ContactFragmentDialog.ContactFragmentDialogListener() {
+            @Override
+            public void onNegativeButtonClick() {
+
+            }
+
+            @Override
+            public void onPositiveButtonClick(String email, String comment) {
+                sendComment(post, email, comment);
+            }
+        });
+        contactFragmentDialog.show(getFragmentManager(), Long.toString(post.getId()));
+    }
+
+    private void sendComment(Post post, String email, String comment) {
+        PostController.sendComment(email, post.getUser().getEmail(), comment);
+    }
+
+    @Subscribe
+    public void onCommentSend(OnCommentSendEvent event) {
+        Toast.makeText(getContext(), "Seu comentário foi enviado! :)", Toast.LENGTH_SHORT).show();
+    }
+
+    @Subscribe
+    public void onCommentSendFailed(OnCommentSendFailedEvent event) {
+        Toast.makeText(getContext(), "Seu comentário não foi enviado! :(", Toast.LENGTH_SHORT).show();
     }
 }

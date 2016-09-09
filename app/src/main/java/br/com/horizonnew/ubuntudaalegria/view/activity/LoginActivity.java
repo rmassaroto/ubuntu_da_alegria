@@ -3,7 +3,6 @@ package br.com.horizonnew.ubuntudaalegria.view.activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +15,8 @@ import br.com.horizonnew.ubuntudaalegria.R;
 import br.com.horizonnew.ubuntudaalegria.manager.base.BaseActivity;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.event.user.OnLogUserInEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.event.user.OnLogUserInFailedEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.user.OnSignUserUpEvent;
+import br.com.horizonnew.ubuntudaalegria.manager.bus.event.user.OnSignUserUpFailedEvent;
 import br.com.horizonnew.ubuntudaalegria.manager.bus.provider.UserProviderBus;
 import br.com.horizonnew.ubuntudaalegria.manager.network.controller.UserController;
 
@@ -28,7 +29,7 @@ public class LoginActivity extends BaseActivity {
 
     private RelativeLayout mLoginRelativeLayout, mSignUpRelativeLayout;
 
-    private EditText mEmailEditText, mPasswordEditText;
+    private EditText mEmailEditText, mPasswordEditText, mNameEditText;
     private Button mLoginButton, mGuestButton, mSignUpButton;
     private TextView mSignUpTextView;
 
@@ -44,6 +45,7 @@ public class LoginActivity extends BaseActivity {
 
         mEmailEditText = (EditText) findViewById(R.id.activity_login_email_edit_text);
         mPasswordEditText = (EditText) findViewById(R.id.activity_login_password_edit_text);
+        mNameEditText = (EditText) findViewById(R.id.activity_login_name_edit_text);
 
         mLoginButton = (Button) findViewById(R.id.activity_login_log_in_button);
         mGuestButton = (Button) findViewById(R.id.activity_login_guest_button);
@@ -182,6 +184,15 @@ public class LoginActivity extends BaseActivity {
             mPasswordEditText.setError("A senha deve ter ao menos 6 caracteres!");
         }
 
+        if (mMode == MODE_SIGN_UP) {
+            String name = mNameEditText.getText().toString().trim();
+            if (name.isEmpty()) {
+                result = false;
+
+                mNameEditText.setError("Este campo não pode estar vazio!");
+            }
+        }
+
         return result;
     }
 
@@ -215,7 +226,7 @@ public class LoginActivity extends BaseActivity {
 
         showAlertDialog(
                 R.string.dialog_title_error,
-                R.string.error_message_could_not_log_user_want_to_try_again,
+                R.string.error_message_could_not_log_user_in_want_to_try_again,
                 R.string.button_cancel, null,
                 R.string.button_try_again, new DialogInterface.OnClickListener() {
                     @Override
@@ -235,10 +246,44 @@ public class LoginActivity extends BaseActivity {
 
     private void signUserUp() {
         if (areFieldsValid()) {
-            //TODO: Log user in
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
+            showProgressDialog(
+                    R.string.dialog_title_wait,
+                    R.string.message_signing_user_up_please_wait
+            );
+
+            UserController.signUserUp(
+                    this,
+                    mEmailEditText.getText().toString(),
+                    mPasswordEditText.getText().toString(),
+                    mNameEditText.getText().toString()
+            );
         }
+    }
+
+    @Subscribe
+    public void onSignUserUp(OnSignUserUpEvent event) {
+        dismissDialogs();
+
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @Subscribe
+    public void onSignUserUpFailed(OnSignUserUpFailedEvent event) {
+        dismissDialogs();
+
+        showAlertDialog(
+                R.string.dialog_title_error,
+                R.string.error_message_could_not_sign_user_up_want_to_try_again,
+                R.string.button_cancel, null,
+                R.string.button_try_again, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        signUserUp();
+                    }
+                }
+        );
     }
 
     private void showSignUp() {

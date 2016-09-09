@@ -7,17 +7,17 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
@@ -49,13 +49,22 @@ public class CreatePostActivity extends BaseActivity {
 
     public static final String ARG_TYPE = "br.com.horizonnew.ubuntudaalegria.view.activity.CreatePostActivity.ARG_TYPE";
     public static final String ARG_IMAGE_PATH = "br.com.horizonnew.ubuntudaalegria.view.activity.CreatePostActivity.ARG_IMAGE_PATH";
+    public static final String ARG_MODE = "br.com.horizonnew.ubuntudaalegria.view.activity.CreatePostActivity.ARG_MODE";
+    public static final String ARG_POST = "br.com.horizonnew.ubuntudaalegria.view.activity.CreatePostActivity.ARG_POST";
+
+    public static final int MODE_CREATE_POST = 0;
+    public static final int MODE_SEE_POST = 1;
 
     private NestedScrollView mScrollView;
     private ImageView mPhotoImageView;
-    private EditText mYoutubeUrl, mTitleEditText, mTextEditText;
+    private TextInputLayout mYoutubeUrlTextInputLayout;
+    private EditText mYoutubeUrlEditText, mTitleEditText, mTextEditText;
+    private TextView mCampaignTextView;
     private Switch mCampaignSwitch;
 
     private FloatingActionButton mFab;
+
+    private int mMode;
 
     private AFImageProvider mImageProvider;
     private int mType;
@@ -77,64 +86,123 @@ public class CreatePostActivity extends BaseActivity {
         if (savedInstanceState != null) {
             mType = savedInstanceState.getInt(ARG_TYPE, Post.TYPE_TEXT);
             mImagePath = savedInstanceState.getString(ARG_IMAGE_PATH, null);
+            mMode = savedInstanceState.getInt(ARG_MODE, MODE_CREATE_POST);
+
+            mPost = savedInstanceState.getParcelable(ARG_POST);
         } else {
+            if (getIntent().hasExtra(ARG_POST)) {
+                mPost = getIntent().getParcelableExtra(ARG_POST);
+            }
+
             if (getIntent().hasExtra(ARG_TYPE)) {
                 mType = getIntent().getIntExtra(ARG_TYPE, Post.TYPE_TEXT);
-            } else {
-                throw new RuntimeException("Could not find type in intent extras");
+            }
+
+            if (getIntent().hasExtra(ARG_MODE)) {
+                mMode = getIntent().getIntExtra(ARG_MODE, MODE_CREATE_POST);
             }
         }
 
         mScrollView = (NestedScrollView) findViewById(R.id.activity_create_post_scroll_view);
 
-        mYoutubeUrl = (EditText) findViewById(R.id.activity_create_post_url_edit_text);
+        mYoutubeUrlTextInputLayout = (TextInputLayout) findViewById(R.id.activity_create_post_url);
+        mYoutubeUrlEditText = (EditText) findViewById(R.id.activity_create_post_url_edit_text);
         mPhotoImageView = (ImageView) findViewById(R.id.activity_create_post_image_view);
         mTitleEditText = (EditText) findViewById(R.id.activity_create_post_title_edit_text);
         mTextEditText = (EditText) findViewById(R.id.activity_create_post_text_edit_text);
+        mCampaignTextView = (TextView) findViewById(R.id.activity_create_post_campaign_text_view);
         mCampaignSwitch = (Switch) findViewById(R.id.activity_create_post_campaign_switch);
 
-        switch (mType) {
-            case Post.TYPE_TEXT:
-                mYoutubeUrl.setVisibility(View.GONE);
-                mPhotoImageView.setVisibility(View.GONE);
-                break;
-            case Post.TYPE_IMAGE:
-                mYoutubeUrl.setVisibility(View.GONE);
-                break;
-            case Post.TYPE_VIDEO:
-                mPhotoImageView.setVisibility(View.GONE);
-                break;
-        }
-
         mFab = (FloatingActionButton) findViewById(R.id.fab);
-        mFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                createPost();
+        if (mMode == MODE_CREATE_POST) {
+            switch (mType) {
+                case Post.TYPE_TEXT:
+                    mYoutubeUrlTextInputLayout.setVisibility(View.GONE);
+                    mYoutubeUrlEditText.setVisibility(View.GONE);
+                    mPhotoImageView.setVisibility(View.GONE);
+                    break;
+                case Post.TYPE_IMAGE:
+                    mYoutubeUrlTextInputLayout.setVisibility(View.GONE);
+                    mYoutubeUrlEditText.setVisibility(View.GONE);
+                    break;
+                case Post.TYPE_VIDEO:
+                    mPhotoImageView.setVisibility(View.GONE);
+                    break;
             }
-        });
-        mFab.post(new Runnable() {
-            @Override
-            public void run() {
-                mScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-                    @Override
-                    public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                        if (scrollY > oldScrollY) {
-                            mFab.hide();
-                        } else {
-                            mFab.show();
+
+            User user = UserController.getLoggedUser(this);
+            if (user != null) {
+                switch (user.getGroup()) {
+                    case 0:
+                        mCampaignTextView.setVisibility(View.GONE);
+                        mCampaignSwitch.setVisibility(View.GONE);
+                        break;
+                    case 1:
+                        mCampaignTextView.setVisibility(View.GONE);
+                        mCampaignSwitch.setVisibility(View.GONE);
+                        break;
+                    case 2:
+                        mCampaignTextView.setVisibility(View.VISIBLE);
+                        mCampaignSwitch.setVisibility(View.VISIBLE);
+                        break;
+                }
+            }
+
+            mFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    createPost();
+                }
+            });
+            mFab.post(new Runnable() {
+                @Override
+                public void run() {
+                    mScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+                        @Override
+                        public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                            if (scrollY > oldScrollY) {
+                                mFab.hide();
+                            } else {
+                                mFab.show();
+                            }
                         }
-                    }
-                });
+                    });
+                }
+            });
+        } else {
+
+            mFab.hide();
+            mTitleEditText.setEnabled(false);
+            mTextEditText.setEnabled(false);
+
+            mYoutubeUrlTextInputLayout.setVisibility(View.GONE);
+            mYoutubeUrlEditText.setVisibility(View.GONE);
+            mCampaignTextView.setVisibility(View.GONE);
+            mCampaignSwitch.setVisibility(View.GONE);
+
+            if (mPost != null) {
+                setTitle(mPost.getTitle());
+
+                if (mPost.getType() == Post.TYPE_IMAGE) {
+                    PicassoSingleton.getInstance(this)
+                            .load(mPost.getUrl())
+                            .fit()
+                            .centerCrop()
+                            .error(R.mipmap.ic_launcher)
+                            .into(mPhotoImageView);
+                }
+
+                mTitleEditText.setText(mPost.getTitle());
+                mTextEditText.setText(mPost.getText());
             }
-        });
+        }
 
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (mType == Post.TYPE_IMAGE) {
+        if (mMode == MODE_CREATE_POST && mType == Post.TYPE_IMAGE) {
             getMenuInflater().inflate(R.menu.menu_create_post, menu);
 
             return true;
@@ -195,7 +263,11 @@ public class CreatePostActivity extends BaseActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(ARG_TYPE, mType);
-        outState.putString(ARG_TYPE, mImagePath);
+        outState.putString(ARG_IMAGE_PATH, mImagePath);
+        outState.putInt(ARG_MODE, mMode);
+
+        if (mPost != null)
+            outState.putParcelable(ARG_POST, mPost);
     }
 
     private void addPicture() {
@@ -276,7 +348,7 @@ public class CreatePostActivity extends BaseActivity {
             if (mType == Post.TYPE_IMAGE) {
                 uploadPhoto();
             } else if (mType == Post.TYPE_VIDEO) {
-                uploadPost(mYoutubeUrl.getText().toString().trim());
+                uploadPost(mYoutubeUrlEditText.getText().toString().trim());
             }
         }
     }
@@ -330,7 +402,7 @@ public class CreatePostActivity extends BaseActivity {
 
         switch (mType) {
             case Post.TYPE_VIDEO:
-                mPost.setUrl(mYoutubeUrl.getText().toString().trim());
+                mPost.setUrl(mYoutubeUrlEditText.getText().toString().trim());
                 break;
             case Post.TYPE_IMAGE:
                 mPost.setUrl(url);

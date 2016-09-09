@@ -21,10 +21,12 @@ public class User implements Parcelable {
     public static final String API_KEYWORD_EMAIL = "email";
     public static final String API_KEYWORD_NAME = "name";
     public static final String API_KEYWORD_PICTURE_URL = "picture_url";
+    public static final String API_KEYWORD_GROUP = "group";
     public static final String API_KEYWORD_PASSWORD = "password";
 
     private long id;
-    private String name, pictureUrl;
+    private int group;
+    private String name, email, pictureUrl;
 
     public static Creator<User> CREATOR = new Creator<User>() {
         @Override
@@ -40,15 +42,13 @@ public class User implements Parcelable {
 
     public User() {
         super();
-
-        id = 1;
-        name = "Douglas Faria";
-        pictureUrl = "http://www.vitamin-ha.com/wp-content/uploads/2013/09/Funny-Profile-Pictures-14.jpg";
     }
 
     public User(Parcel in) {
         id = in.readLong();
+        group = in.readInt();
         name = in.readString();
+        email = in.readString();
         pictureUrl = in.readString();
     }
 
@@ -59,8 +59,14 @@ public class User implements Parcelable {
             if (jsonObject.has(API_KEYWORD_USER_ID))
                 id = jsonObject.get(API_KEYWORD_USER_ID).getAsLong();
 
+            if (jsonObject.has(API_KEYWORD_GROUP))
+                group = jsonObject.get(API_KEYWORD_GROUP).getAsInt();
+
             if (jsonObject.has(API_KEYWORD_NAME))
                 name = jsonObject.get(API_KEYWORD_NAME).getAsString();
+
+            if (jsonObject.has(API_KEYWORD_EMAIL))
+                email = jsonObject.get(API_KEYWORD_EMAIL).getAsString();
 
             if (jsonObject.has(API_KEYWORD_PICTURE_URL))
                 pictureUrl = jsonObject.get(API_KEYWORD_PICTURE_URL).getAsString();
@@ -78,7 +84,9 @@ public class User implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
+        dest.writeInt(group);
         dest.writeString(name);
+        dest.writeString(email);
         dest.writeString(pictureUrl);
     }
 
@@ -90,12 +98,28 @@ public class User implements Parcelable {
         this.id = id;
     }
 
+    public int getGroup() {
+        return group;
+    }
+
+    public void setGroup(int group) {
+        this.group = group;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPictureUrl() {
@@ -106,11 +130,15 @@ public class User implements Parcelable {
         this.pictureUrl = pictureUrl;
     }
 
-    public JsonObject toJsonObject() {
+    public JsonObject toJsonObject(boolean includeId) {
         JsonObject jsonObject = new JsonObject();
 
-        jsonObject.addProperty(API_KEYWORD_USER_ID, id);
+        if (includeId)
+            jsonObject.addProperty(API_KEYWORD_USER_ID, id);
+
         jsonObject.addProperty(API_KEYWORD_NAME, name);
+        jsonObject.addProperty(API_KEYWORD_GROUP, group);
+        jsonObject.addProperty(API_KEYWORD_EMAIL, email);
         jsonObject.addProperty(API_KEYWORD_PICTURE_URL, pictureUrl);
 
         return jsonObject;

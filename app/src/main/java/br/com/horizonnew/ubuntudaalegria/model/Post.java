@@ -107,7 +107,7 @@ public class Post implements Parcelable {
 
             if (jsonObject.has(API_KEYWORD_CREATE_DATE)) {
                 try {
-                    createDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(jsonObject.get(API_KEYWORD_CAMPAIGN).getAsString());
+                    createDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(jsonObject.get(API_KEYWORD_CREATE_DATE).getAsString());
                 } catch (ParseException e) {
                     Log.e(LOG_TAG, "Post: ", e);
                 }
@@ -238,7 +238,7 @@ public class Post implements Parcelable {
         if (createDate != null)
             jsonObject.addProperty(API_KEYWORD_CREATE_DATE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(createDate));
 
-        jsonObject.add(API_KEYWORD_USER, user.toJsonObject());
+        jsonObject.add(API_KEYWORD_USER, user.toJsonObject(true));
 
         return jsonObject;
     }

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import br.com.horizonnew.ubuntudaalegria.R;
+import br.com.horizonnew.ubuntudaalegria.manager.network.controller.UserController;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -19,13 +20,20 @@ public class SplashActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                showHome();
+                proceedWithAppLaunch();
             }
         }, SPLASH_DURATION);
     }
 
-    private void showHome() {
-        Intent intent = new Intent(this, LoginActivity.class);
+    private void proceedWithAppLaunch() {
+        Intent intent;
+
+        if (UserController.getLoggedUser(this) == null) {
+            intent = new Intent(this, LoginActivity.class);
+        } else {
+            intent = new Intent(this, MainActivity.class);
+        }
+
         startActivity(intent);
         finish();
     }
