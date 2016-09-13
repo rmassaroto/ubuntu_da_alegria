@@ -417,8 +417,7 @@ public class CreatePostActivity extends BaseActivity {
         mPost.setCampaign(mCampaignSwitch.isChecked());
         mPost.setActive(true);
 
-        //TODO: Replace for the real user
-        mPost.setUser(new User());
+        mPost.setUser(UserController.getLoggedUser(this));
 
         PostController.uploadPost(mPost);
     }
